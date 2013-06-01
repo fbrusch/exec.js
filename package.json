@@ -8,5 +8,8 @@
   },
   "repository": "",
   "author": "",
-  "license": "BSD"
+  "license": "BSD",
+  "dependencies": {
+    "winston": "~0.7.1"
+  }
 }
