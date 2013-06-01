@@ -10,6 +10,7 @@
   "author": "",
   "license": "BSD",
   "dependencies": {
-    "winston": "~0.7.1"
+    "winston": "~0.7.1",
+    "MD5": "~1.0.3"
   }
 }
