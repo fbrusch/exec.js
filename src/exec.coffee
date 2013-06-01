@@ -1,23 +1,18 @@
-spawn = require("child_process").spawn
+exec = require("child_process").exec
 fs = require "fs"
 logger = require "./log"
 md5 = require "MD5"
+TMP_DIR = "./tmp"
 tmp = (filename) -> 
-    "./tmp/" + filename
+    TMP_DIR + "/" + filename
 
 execC = (prg, callback) ->
     filename = md5 prg
     fs.writeFile (tmp filename) + ".c", prg, {}, ->
-        compile = spawn "gcc", [(tmp filename) + ".c", "-o", (tmp filename)]
-        compile.on "close", ->
-            logger.info "compilazione finita"
-            run = spawn (tmp filename), []
-            run.stdout.on "data", (data) ->
-                callback data.toString()
-            run.stdout.on "end", ->
-                logger.info "eof"
-            run.on "close", ->
-                logger.info "esecuzione finita"
+        exec "gcc " + [(tmp filename) + ".c", "-o", (tmp filename)].join(" "),
+            (error, stdout, stderr) ->
+                exec (tmp filename), (error, stdout, stderr) ->
+                    callback stdout
 
 evalCf = (prg, args, callback) ->
     prologue = "#include <stdio.h>"
