@@ -18,7 +18,6 @@ int main()
 }
 "
 
-console.log mainTemplate {args:"none"}
 execC = (prg, callback) ->
     filename = md5 prg
     fs.writeFile (tmp filename) + ".c", prg, {}, ->
