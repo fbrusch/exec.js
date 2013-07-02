@@ -3,7 +3,7 @@ fs = require "fs"
 logger = require "./log"
 md5 = require "MD5"
 swig = require "swig"
-TMP_DIR = "./tmp"
+TMP_DIR = process.env.TMP_DIR || "./tmp"
 tmp = (filename) -> 
     TMP_DIR + "/" + filename
 
@@ -18,13 +18,25 @@ int main()
 }
 "
 
+# ok, ora dobbiamo gestire:
+# errori di compilazione
+#
 execC = (prg, callback) ->
     filename = md5 prg
-    fs.writeFile (tmp filename) + ".c", prg, {}, ->
-        exec "gcc " + [(tmp filename) + ".c", "-o", (tmp filename)].join(" "),
-            (error, stdout, stderr) ->
-                exec (tmp filename), (error, stdout, stderr) ->
-                    callback stdout
+    fs.writeFile (tmp filename) + ".c", prg, {}, (err) ->
+        if (err isnt null) then console.log ("couldn't write file " + tmp(filename))
+        else
+            exec "gcc " + [(tmp filename) + ".c", "-o", (tmp filename)].join(" "),
+                (compileError, compileStdout, compileStderr) ->
+                    exec (tmp filename), (error, stdout, stderr) ->
+                        callback (
+                            stdout: stdout
+                            stderr: stderr
+                            error: error
+                            compileStdout: compileStdout
+                            compileStderr: compileStderr
+                            compileError: compileError
+                        )
 
 evalCf = (f, args, callback) ->
     f_args = (x.toString() for x in args).join(",")
